@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">LiveDataPractices</string>
+    <string name="to_arch">To Arch Page</string>
+    <string name="increase">Start Increase</string>
+</resources>

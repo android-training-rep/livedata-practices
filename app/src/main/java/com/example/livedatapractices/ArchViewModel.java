@@ -1,14 +1,12 @@
 package com.example.livedatapractices;
 
-import android.os.SystemClock;
 import android.util.Log;
-
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.concurrent.TimeUnit;
+
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -27,7 +25,7 @@ public class ArchViewModel extends ViewModel {
         return count;
     }
     public void increase() {
-        Observer observer = new Observer<Integer>(){
+        Observer observer = new Observer<Object>(){
 
             @Override
             public void onSubscribe(Disposable d) {
@@ -35,9 +33,10 @@ public class ArchViewModel extends ViewModel {
             }
 
             @Override
-            public void onNext(Integer newCount) {
+            public void onNext(Object O) {
                 Log.d(TAG, "in onNext");
-                count.postValue(newCount);
+                Integer current = Integer.parseInt(count.getValue().toString());
+                count.postValue(++current);
             }
 
             @Override
@@ -51,18 +50,8 @@ public class ArchViewModel extends ViewModel {
             }
         };
 
-        Observable observable = Observable.create(new ObservableOnSubscribe<Integer>() {
-            @Override
-            public void subscribe(ObservableEmitter<Integer> emitter) throws Exception {
-                while(true) {
-                    Integer current = Integer.parseInt(count.getValue().toString());
-                    SystemClock.sleep(1000);
-                    ++current;
-                    emitter.onNext(current);
-                }
-            }
-        });
-        observable.subscribeOn(Schedulers.io())
+        Observable.interval(1000, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((io.reactivex.Observer) observer);
     }

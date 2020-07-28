@@ -17,6 +17,7 @@ import io.reactivex.schedulers.Schedulers;
 public class ArchViewModel extends ViewModel {
     private MutableLiveData<Integer> count;
     public static final String TAG =  "Arch Model";
+    Disposable disposable;
 
     public MutableLiveData<Integer> getCount() {
         if(count == null) {
@@ -30,13 +31,13 @@ public class ArchViewModel extends ViewModel {
 
             @Override
             public void onSubscribe(Disposable d) {
-
+                disposable = d;
             }
 
             @Override
-            public void onNext(Integer integer) {
-                Log.d(TAG, "onNext current="+integer);
-                count.postValue(integer);
+            public void onNext(Integer newCount) {
+                Log.d(TAG, "in onNext");
+                count.postValue(newCount);
             }
 
             @Override
@@ -53,14 +54,24 @@ public class ArchViewModel extends ViewModel {
         Observable observable = Observable.create(new ObservableOnSubscribe<Integer>() {
             @Override
             public void subscribe(ObservableEmitter<Integer> emitter) throws Exception {
-                Integer current = Integer.parseInt(count.getValue().toString());
-                SystemClock.sleep(1000);
-                 ++current;
-                 emitter.onNext(current);
+                while(true) {
+                    Integer current = Integer.parseInt(count.getValue().toString());
+                    SystemClock.sleep(1000);
+                    ++current;
+                    emitter.onNext(current);
+                }
             }
         });
         observable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((io.reactivex.Observer) observer);
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        if(disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+        }
     }
 }

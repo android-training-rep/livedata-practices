@@ -38,5 +38,13 @@ public class ArchActivity extends AppCompatActivity {
                 model.increase();
             }
         });
+
+        Button stopBtn = findViewById(R.id.btn_stop);
+        stopBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                model.onCleared();
+            }
+        });
     }
 }

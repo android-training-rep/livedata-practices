@@ -34,10 +34,14 @@ public class ArchViewModel extends ViewModel {
             }
 
             @Override
-            public void onNext(Object O) {
+            public void onNext(Object o) {
                 Log.d(TAG, "in onNext");
-                Integer current = Integer.parseInt(count.getValue().toString());
-                count.postValue(++current);
+                try {
+                    Integer current = Integer.parseInt(count.getValue().toString());
+                    count.postValue(++current);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override

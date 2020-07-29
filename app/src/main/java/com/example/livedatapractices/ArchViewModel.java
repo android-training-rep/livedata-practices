@@ -9,13 +9,14 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class ArchViewModel extends ViewModel {
     private MutableLiveData<Integer> count;
     public static final String TAG =  "Arch Model";
-    Disposable disposable;
+    CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public MutableLiveData<Integer> getCount() {
         if(count == null) {
@@ -29,7 +30,7 @@ public class ArchViewModel extends ViewModel {
 
             @Override
             public void onSubscribe(Disposable d) {
-                disposable = d;
+                compositeDisposable.add(d);
             }
 
             @Override
@@ -58,9 +59,7 @@ public class ArchViewModel extends ViewModel {
 
     @Override
     protected void onCleared() {
+        compositeDisposable.clear();
         super.onCleared();
-        if(disposable != null && !disposable.isDisposed()) {
-            disposable.dispose();
-        }
     }
 }
